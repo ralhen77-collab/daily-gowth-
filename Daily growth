@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Daily Growth">
+<meta name="theme-color" content="#0f0f13">
+<title>Peeyush Daily Growth</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f13;--card:#1a1a22;--card2:#22222e;--border:#2e2e3e;--text:#f0f0f4;--muted:#7a7a90;--accent:#7c6af7;--accent2:#a599fa;--green:#3ecf8e;--green-dim:#1a3d2e;--yellow:#f5c842;--red:#f26b6b;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px 80px;}
+.header{text-align:center;margin-bottom:32px;}
+.header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.03em;color:var(--text);}
+.header .date-str{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.1em;}
+.ring-wrap{display:flex;justify-content:center;align-items:center;margin-bottom:32px;position:relative;}
+.ring-svg{width:140px;height:140px;}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:10;}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;stroke-dasharray:345;stroke-dashoffset:345;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1),stroke 0.4s;}
+.ring-center{position:absolute;text-align:center;}
+.ring-pct{font-size:1.6rem;font-weight:700;color:var(--text);line-height:1;}
+.ring-label{font-size:0.62rem;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;}
+.nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;}
+.nav-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--muted);width:36px;height:36px;cursor:pointer;font-size:1rem;transition:border-color .15s,color .15s;display:flex;align-items:center;justify-content:center;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent2);}
+.nav-date{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);min-width:160px;text-align:center;}
+.section-label{font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent2);margin:24px 0 10px;padding-left:4px;}
+.task-list{display:flex;flex-direction:column;gap:8px;max-width:480px;margin:0 auto;}
+.task-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none;}
+.task-card:hover{border-color:var(--accent);background:var(--card2);}
+.task-card.done{border-color:var(--green);background:var(--green-dim);}
+.check{width:26px;height:26px;border-radius:8px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.8rem;transition:all .2s;}
+.task-card.done .check{background:var(--green);border-color:var(--green);color:#0f2e1e;font-size:0.9rem;}
+.task-card:hover:not(.done) .check{border-color:var(--accent);}
+.task-info{flex:1;}
+.task-name{font-size:0.9rem;font-weight:500;color:var(--text);transition:color .15s;}
+.task-card.done .task-name{color:var(--green);text-decoration:line-through;text-decoration-color:#3ecf8e66;}
+.task-time{font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--muted);margin-top:3px;}
+.task-streak{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--yellow);}
+.history-strip{display:flex;gap:4px;margin-top:8px;}
+.history-dot{width:8px;height:8px;border-radius:2px;background:var(--border);transition:background .2s;}
+.history-dot.on{background:var(--green);}
+.history-dot.today-dot{outline:2px solid var(--accent);outline-offset:1px;}
+.week-bar{max-width:480px;margin:32px auto 0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.week-bar-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:12px;font-family:'JetBrains Mono',monospace;}
+.week-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.week-day{text-align:center;}
+.wd-label{font-size:0.58rem;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:4px;}
+.wd-bar-wrap{height:48px;display:flex;align-items:flex-end;justify-content:center;}
+.wd-bar{width:100%;max-width:20px;border-radius:4px 4px 0 0;background:var(--border);transition:height .4s ease,background .3s;min-height:4px;}
+.wd-pct{font-size:0.58rem;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+.wd-today .wd-label{color:var(--accent2);}
+.wd-today .wd-bar{background:var(--accent);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--green);color:#0a2018;font-size:0.82rem;font-weight:600;padding:10px 22px;border-radius:100px;opacity:0;transition:transform .3s ease,opacity .3s ease;pointer-events:none;white-space:nowrap;z-index:100;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Peeyush Daily Growth</h1>
+  <div class="date-str" id="date-str"></div>
+</div>
+<div class="ring-wrap">
+  <svg class="ring-svg" viewBox="0 0 120 120">
+    <circle class="ring-bg" cx="60" cy="60" r="55"/>
+    <circle class="ring-fill" id="ring" cx="60" cy="60" r="55"/>
+  </svg>
+  <div class="ring-center">
+    <div class="ring-pct" id="ring-pct">0%</div>
+    <div class="ring-label" id="ring-sub">0 / 0</div>
+  </div>
+</div>
+<div class="nav">
+  <button class="nav-btn" onclick="changeDay(-1)">&#8592;</button>
+  <div class="nav-date" id="nav-date"></div>
+  <button class="nav-btn" onclick="changeDay(1)">&#8594;</button>
+</div>
+<div class="task-list" id="task-list"></div>
+<div class="week-bar">
+  <div class="week-bar-title">This Week</div>
+  <div class="week-days" id="week-days"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const TASKS=[{section:"☀️ Morning"},{id:"ice",name:"Ice",time:"9:00 – 9:30 AM"},{id:"brush_am",name:"Brush",time:"9:00 – 9:30 AM"},{id:"chia_am",name:"Chia Drink",time:"9:00 – 10:00 AM"},{section:"📚 Class & Study"},{id:"class_am",name:"Class",time:"10
